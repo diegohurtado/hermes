@@ -1,23 +1,8 @@
 #!/bin/bash -xe
-
-if [[ -z ${PARAMS} ]]; then
-    echo "No params provided!"
-    exit 1
-fi
-
-client=$(echo $PARAMS | grep hermes.client=true || true)
-echo "Params: ${PARAMS}"
-
-if [[ ! -z ${MARATHON_APP_LABEL_DCOS_PACKAGE_NAME} ]]; then
-	sleep 10
-	ping -c10 ${MARATHON_APP_LABEL_DCOS_PACKAGE_NAME}.marathon.mesos 
-	host -t a ${MARATHON_APP_LABEL_DCOS_PACKAGE_NAME}.marathon.mesos
-fi
-
-if [[ -z ${client} ]]; then
-    java -jar ${PARAMS} /hermes.jar
+if [ $SEED = "true" ]; then
+    java -jar -Dkhermes.ws=true -Dakka.remote.netty.tcp.port=$SEED_PORT -Dakka.remote.netty.tcp.hostname=localhost -Dakka.cluster.seed-nodes.0=akka.tcp://khermes@localhost:$SEED_PORT -Dmetrics.graphite.enabled=$METRICS_ENABLED -Dmetrics.graphite.name=$GRAPHITE_METRICS_NAME -Dzookeeper.connection=localhost:$ZK_PORT /hermes.jar
 else
-    screen -S client -d -m java -jar ${PARAMS} /hermes.jar
+    java -jar -Dkhermes.client=true -Dkhermes.ws=false -Dakka.remote.netty.tcp.port=$NODE_PORT -Dakka.cluster.seed-nodes.0=akka.tcp://khermes@localhost:$SEED_PORT -Dmetrics.graphite.enabled=$METRICS_ENABLED -Dmetrics.graphite.name=$GRAPHITE_METRICS_NAME -Dzookeeper.connection=localhost:$ZK_PORT /hermes.jar
 fi
 
-tail -F /var/log/sds/hermes/hermes.log
+tail -F /khermes.log
