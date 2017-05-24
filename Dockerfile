@@ -1,13 +1,14 @@
-FROM stratio/ubuntu-base:16.04
+FROM qa.stratio.com/stratio/ubuntu-base:16.04
 
 MAINTAINER stratio
 
 ARG VERSION
 
-RUN apt-get update && apt-get install -y screen
-
-COPY target/hermes-${VERSION}-allinone.jar /hermes.jar
+COPY target/hermes-0.2.0-SNAPSHOT.jar /hermes.jar
 COPY docker/docker-entrypoint.sh /
 COPY src/main/resources/application.conf /
+RUN touch /hermes.log
+
+EXPOSE 8080
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
