@@ -5,4 +5,5 @@ else
     java -jar -Dkhermes.client=true -Dkhermes.ws=false -Dakka.remote.netty.tcp.port=$NODE_PORT -Dakka.cluster.seed-nodes.0=akka.tcp://khermes@localhost:$SEED_PORT -Dmetrics.graphite.enabled=$METRICS_ENABLED -Dmetrics.graphite.name=$GRAPHITE_METRICS_NAME -Dzookeeper.connection=localhost:$ZK_PORT /hermes.jar
 fi
 
+
 tail -F /khermes.log
